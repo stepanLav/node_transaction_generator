@@ -1,0 +1,31 @@
+{
+  "name": "node_transaction_generator",
+  "version": "1.0.0",
+  "description": "Script for generate many transaction to sora",
+  "main": "dist/App.js",
+  "scripts": {
+    "prebuild": "tslint -p tsconfig.json --fix",
+    "build": "tsc",
+    "prestart": "npm run build",
+    "start": "ts-node src/App.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Stepan Lavrentev",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^15.12.2",
+    "tslint": "^6.1.3",
+    "typescript": "^4.3.2"
+  },
+  "dependencies": {
+    "@polkadot/keyring": "^6.8.1",
+    "@sora-substrate/util": "^1.3.33",
+    "async-parallel": "^1.2.3",
+    "bip39": "^3.0.4",
+    "pg": "^8.6.0",
+    "reflect-metadata": "^0.1.13",
+    "ts-node": "^10.0.0",
+    "typeorm": "^0.2.34"
+  }
+}
