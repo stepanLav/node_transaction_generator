@@ -21,3 +21,15 @@ export function createKeyringFromMnemonic(cryptoType: KeypairType, mnemonic: str
     const userName = 'test'
     return cast.addFromMnemonic(mnemonic, { name: userName })
 }
+
+export function makestring(length: number, onlyLetters=false) {
+    let result = '';
+    let characters: string
+    characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 '
+    if (onlyLetters) characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
