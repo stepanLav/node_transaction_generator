@@ -1,13 +1,14 @@
 // import "reflect-metadata"
 import loadGenerator from './userInteraction/LoadUserGenerator'
-import scenario from './case/CreateUsers'
+import scenario from './case/CreateCustomToken'
 import { LoadUser } from './userInteraction/LoadUser'
 import * as Parallel from 'async-parallel'
 import { BaseConnection } from './database/BaseConnection'
+import * as property from '../local.properties.json'
 
-const url = process.env.URL || 'wss://ws.framenode-1.s1.dev.sora2.soramitsu.co.jp/'
+const url = process.env.URL || property.DEV.url
 const userCount = 1
-const userIterations = 10
+const userIterations = 100
 
 class App {
 
