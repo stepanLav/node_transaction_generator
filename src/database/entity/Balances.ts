@@ -14,9 +14,6 @@ export class Balances {
     @CreateDateColumn()
     createdDate: Date;
 
-    @UpdateDateColumn()
-    updatedDate: Date;
-
     @ManyToOne(() => PolkaswapUser, user => user.balances)
     user: PolkaswapUser;
 

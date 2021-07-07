@@ -22,9 +22,6 @@ export class AssetList {
     @CreateDateColumn()
     createdDate: Date;
 
-    @UpdateDateColumn()
-    updatedDate: Date;
-
     @OneToMany(() => Balances, balances => balances.user)
     assetId: Balances[];
 

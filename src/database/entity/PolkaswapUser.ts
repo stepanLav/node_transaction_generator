@@ -25,9 +25,6 @@ export class PolkaswapUser {
     @CreateDateColumn()
     createdDate: Date;
 
-    @UpdateDateColumn()
-    updatedDate: Date;
-
     @OneToMany(() => Balances, balances => balances.user)
     balances: Balances[];
 
