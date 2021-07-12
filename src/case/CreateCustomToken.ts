@@ -1,6 +1,6 @@
-import { api, KnownAssets, KnownSymbols } from "@sora-substrate/util";
+import { api } from "@sora-substrate/util";
 import { AssetList } from "../database";
-import { createKeyringFromMnemonic, makestring } from "../utils/usefullFunctions";
+import { createKeyringThroughPair, makestring } from "../utils/usefullFunctions";
 import { BaseConnection } from "../database/BaseConnection";
 import { PolkaswapUser } from "../database/entity/PolkaswapUser";
 import { LoadUser } from "../userInteraction/LoadUser";
@@ -29,23 +29,25 @@ class CreateCustomToken {
                 const users = await userRepo
                     .createQueryBuilder("user")
                     .leftJoinAndSelect("user.balances", "balances")
-                    .leftJoinAndSelect("balances.assetId", "asset_list")
-                    .where("user.hasCustomToken = false")
+                    .leftJoinAndSelect("balances.asset", "asset_list")
+                    .where("user.has_custom_token = false")
                     .limit(amountOfTokens)
                     .getMany();
 
                 let buildExtr = users.map(user => {
                     let symbol = makestring((Math.floor(Math.random() * 7) + 1), true)
                     let tokenName = makestring((Math.floor(Math.random() * 33) + 1))
-                    let keyring = createKeyringFromMnemonic('ed25519', user.mnemonic)
+                    const seed = Uint8Array.from(user.private_key)
+                    const public_key = Uint8Array.from(user.public_key)
+                    let keyring = createKeyringThroughPair('ed25519', public_key, seed )
 
                     let customAsset = new AssetList()
-                    customAsset.tokenOwner = user.address
+                    customAsset.token_owner = user.address
                     customAsset.name = tokenName
                     customAsset.symbol = symbol
-                    customAsset.isPoolToken = false
+                    customAsset.is_pool_token = false
                     customAssetArray.push(customAsset)
-                    user.hasCustomToken = true
+                    user.has_custom_token = true
 
                     let extr = api.api.tx.assets.register(symbol, tokenName, totalSupply, true)
                     return api.submitExtrinsic(extr, keyring)
@@ -61,7 +63,7 @@ class CreateCustomToken {
                     customAssetArray.forEach(element => {
                         if(element.name == (token as any).name){
                             if(element.symbol == (token as any).symbol){
-                                element.tokenAddress = (token as any).asset_id
+                                element.token_address = (token as any).asset_id
                             }
                         }
                     });
@@ -70,7 +72,7 @@ class CreateCustomToken {
                 await manager.insert(AssetList, customAssetArray)
                 let updateUser = users.map(update =>  {
                     delete update.balances
-                    return manager.update(PolkaswapUser, update.userId, update)
+                    return manager.update(PolkaswapUser, update.user_id, update)
                 })
                 await Promise.all(updateUser);
             }

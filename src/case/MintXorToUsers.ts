@@ -25,12 +25,11 @@ class MintXorToUsers {
             async function mintAssetToDBUser() {
 
                 const userRepo = database.connection.getRepository(PolkaswapUser)
-
                 const users = await userRepo
                     .createQueryBuilder("user")
                     .leftJoinAndSelect("user.balances", "balances")
-                    .leftJoinAndSelect("balances.assetId", "asset_list")
-                    .where("user.hasMoney = false")
+                    .leftJoinAndSelect("balances.asset", "asset_list")
+                    .where("user.has_money = false")
                     .limit(1000)
                     .getMany();
 
@@ -48,24 +47,24 @@ class MintXorToUsers {
                 }
                 const manager = database.connection.manager
                 let assetElement = new AssetList()
-                assetElement.isPoolToken = false
+                assetElement.is_pool_token = false
                 assetElement.name = asset.name
                 assetElement.symbol = asset.symbol
-                assetElement.tokenAddress = asset.address
-                assetElement.tokenOwner = (await loadUser.api.api.query.assets.assetOwners(asset.address)).toString()
+                assetElement.token_address = asset.address
+                assetElement.token_owner = (await loadUser.api.api.query.assets.assetOwners(asset.address)).toString()
                 await manager.save(assetElement)
                 let balances: any[] = []
                 for (let user of users){
                     const balance = new Balances();
                     balance.balance = amount;
-                    balance.assetId = assetElement;
+                    balance.asset = assetElement;
                     balance.user = user
-                    user.hasMoney = true;
+                    user.has_money = true;
                     balances.push(balance);
                 }
                 let promises = users.map(update =>  {
                     delete update.balances
-                    return manager.update(PolkaswapUser, update.userId, update)
+                    return manager.update(PolkaswapUser, update.user_id, update)
                 })
                 await Promise.all(promises);
                 await manager.insert(Balances, balances);

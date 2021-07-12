@@ -1,37 +1,47 @@
-import { Entity, Column, CreateDateColumn, PrimaryGeneratedColumn, BeforeInsert, UpdateDateColumn, OneToMany } from "typeorm";
+import { Entity, Column, CreateDateColumn, PrimaryGeneratedColumn, BeforeInsert, OneToMany, Index } from "typeorm";
 import { Balances } from "./Balances";
 
 @Entity()
 export class PolkaswapUser {
 
-    @PrimaryGeneratedColumn()
-    userId: number;
+    @PrimaryGeneratedColumn({ type: "int" })
+    user_id: number;
 
-    @Column()
+    @Column({ type: "text" })
     address: string;
 
-    @Column()
-    mnemonic: string;
+    @Column({ type: "bytea", nullable: false })
+    public_key: Buffer;
 
-    @Column()
-    hasMoney: boolean;
+    @Column({ type: "bytea", nullable: false })
+    private_key: Buffer;
 
-    @Column()
-    hasLiquidity: boolean;
+    @Index()
+    @Column({ type: "bool" })
+    has_money: boolean;
 
-    @Column()
-    hasCustomToken: boolean;
+    @Index()
+    @Column({ type: "bool" })
+    has_liquidity: boolean;
+
+    @Index()
+    @Column({ type: "bool" })
+    has_custom_token: boolean;
 
     @CreateDateColumn()
-    createdDate: Date;
+    created_date: Date;
 
-    @OneToMany(() => Balances, balances => balances.user)
+    @OneToMany(() => Balances, balances => balances.user, {
+        cascade: true,
+        onUpdate: 'CASCADE'
+    })
     balances: Balances[];
+    db_user: Uint8Array;
 
     @BeforeInsert()
     beforeInsertActions() {
-        this.hasMoney = false
-        this.hasLiquidity = false
-        this.hasCustomToken = false
+        this.has_money = false
+        this.has_liquidity = false
+        this.has_custom_token = false
     }
 }

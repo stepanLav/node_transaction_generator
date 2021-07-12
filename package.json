@@ -23,6 +23,7 @@
     "@sora-substrate/util": "^1.3.33",
     "async-parallel": "^1.2.3",
     "bip39": "^3.0.4",
+    "get-random-values": "^1.2.2",
     "pg": "^8.6.0",
     "reflect-metadata": "^0.1.13",
     "ts-node": "^10.0.0",

@@ -1,23 +1,26 @@
-import { Entity, Column, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn, ManyToOne } from "typeorm";
+import { Entity, Column, CreateDateColumn, PrimaryGeneratedColumn, ManyToOne, Index } from "typeorm";
 import { PolkaswapUser } from "./PolkaswapUser";
 import { AssetList } from "./AssetList";
 
 @Entity()
 export class Balances {
 
-    @PrimaryGeneratedColumn()
+    @Index()
+    @PrimaryGeneratedColumn({type: "int"})
     id: number;
 
-    @Column()
+    @Column({type: "text"})
     balance: string;
 
     @CreateDateColumn()
-    createdDate: Date;
+    created_date: Date;
 
+    @Index()
     @ManyToOne(() => PolkaswapUser, user => user.balances)
     user: PolkaswapUser;
 
-    @ManyToOne(() => AssetList, token => token.assetId)
-    assetId: AssetList;
+    @Index()
+    @ManyToOne(() => AssetList, token => token.asset_id)
+    asset: AssetList;
 
 }

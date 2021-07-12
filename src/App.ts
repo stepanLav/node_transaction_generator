@@ -1,6 +1,6 @@
 // import "reflect-metadata"
 import loadGenerator from './userInteraction/LoadUserGenerator'
-import scenario from './case/CreateCustomToken'
+import scenario from './case/CreateUsers'
 import { LoadUser } from './userInteraction/LoadUser'
 import * as Parallel from 'async-parallel'
 import { BaseConnection } from './database/BaseConnection'

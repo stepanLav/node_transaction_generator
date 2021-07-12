@@ -4,25 +4,25 @@ import { Balances } from "./Balances";
 @Entity()
 export class AssetList {
 
-    @PrimaryColumn()
-    tokenAddress: string;
+    @PrimaryColumn({type: "text"})
+    token_address: string;
 
-    @Column()
+    @Column({type: "text"})
     symbol: string;
 
-    @Column()
+    @Column({type: "text"})
     name: string;
 
-    @Column()
-    tokenOwner: string;
+    @Column({type: "text"})
+    token_owner: string;
 
-    @Column()
-    isPoolToken: boolean;
+    @Column({type: "bool"})
+    is_pool_token: boolean;
 
     @CreateDateColumn()
-    createdDate: Date;
+    created_date: Date;
 
     @OneToMany(() => Balances, balances => balances.user)
-    assetId: Balances[];
+    asset_id: Balances[];
 
 }

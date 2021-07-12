@@ -1,8 +1,8 @@
-import { api, KnownAssets, KnownSymbols } from "@sora-substrate/util";
+import { KnownAssets, KnownSymbols } from "@sora-substrate/util";
 import { BaseConnection } from "../database/BaseConnection";
-import { PolkaswapUser } from "../database/entity/PolkaswapUser";
+import { PolkaswapUser, Balances } from "../database";
 import { LoadUser } from "../userInteraction/LoadUser";
-import { PromiseResult } from "@polkadot/api/types"
+import { In } from "typeorm";
 
 class CheckBalance {
     public async execute(loadUser: LoadUser): Promise<void> {
@@ -14,31 +14,32 @@ class CheckBalance {
             }
 
             async function checkBalance() {
-                const userRepo = database.connection.getRepository(PolkaswapUser)
-                const manager = database.connection.manager
+                const dbConnection = database.connection
+                const asset = KnownAssets.get(KnownSymbols.XOR)
 
-                const users = await userRepo
+                let users = await dbConnection.getRepository(PolkaswapUser)
                     .createQueryBuilder("user")
                     .leftJoinAndSelect("user.balances", "balances")
-                    .leftJoinAndSelect("balances.assetId", "asset_list")
-                    .where("user.hasMoney = true")
+                    .leftJoinAndSelect("balances.asset", "asset_list")
+                    .where("user.has_money = true")
                     .limit(1000)
                     .getMany();
 
-                const asset = KnownAssets.get(KnownSymbols.XOR)
+                let currentBalance = users.map(user => {
+                    return (loadUser.api.api.rpc as any).assets.freeBalance(user.address, asset.address)
+                })
 
-                for (let user of users){
-                    const userBalance = await (api.api.rpc as any).assets.freeBalance(user.address, asset.address)
-                    const compareBalance = userBalance.unwrap().balance.toString()
-                }
-                // let rpcExecute = users.map(user => {
-
-                //     return (api.api.rpc as any).assets.freeBalance(user.address, asset.address)
-                // })
-                // let balances = await Promise.all[rpcExecute]
-                // const compareBalances = balances.map(balance => {
-                //     balance.unwrap().balance.toString()
-                // })
+                await Promise.all(currentBalance).then(values => {
+                    for (let i=0; i<values.length; i++) {
+                        const convertedValue = values[i].unwrap().balance.toString()
+                        const tokenBalance = users[i].balances.find(i => i.asset.token_address == asset.address)
+                        tokenBalance.balance = convertedValue
+                        if (convertedValue == 0){
+                            users[i].has_money = false
+                        }
+                    }
+                  })
+                await dbConnection.manager.save(users)
 
             }
             console.log('finish')

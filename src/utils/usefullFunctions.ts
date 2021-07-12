@@ -1,5 +1,5 @@
 import { SubmittableExtrinsicFunction } from '@polkadot/api/promise/types';
-import { KeypairType } from '@polkadot/util-crypto/types'
+import { KeypairType, Keypair } from '@polkadot/util-crypto/types'
 import { KeyringPair } from '@polkadot/keyring/types'
 import { Keyring } from '@polkadot/keyring'
 
@@ -20,6 +20,15 @@ export function createKeyringFromMnemonic(cryptoType: KeypairType, mnemonic: str
     const cast = new Keyring({ type: cryptoType });
     const userName = 'test'
     return cast.addFromMnemonic(mnemonic, { name: userName })
+}
+
+export function createKeyringThroughPair(cryptoType: KeypairType, public_key: Uint8Array, private_key: Uint8Array): KeyringPair {
+    const cast = new Keyring({ type: cryptoType });
+    const keyPair = {
+        publicKey: public_key,
+        secretKey: private_key
+    } as Keypair
+    return cast.addFromPair(keyPair)
 }
 
 export function makestring(length: number, onlyLetters=false) {
